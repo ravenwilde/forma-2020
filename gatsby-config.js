@@ -6,6 +6,8 @@ require("dotenv").config({
   path: `.env.${activeEnv}`,
 })
 
+console.log('PRISMIC_ACCESS_TOKEN =>', process.env.PRISMIC_ACCESS_TOKEN)
+
 module.exports = {
   siteMetadata: {
     title: `Forma`,
