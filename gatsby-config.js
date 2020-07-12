@@ -1,10 +1,32 @@
+const activeEnv = process.env.GATSBY_ACTIVE_ENV || process.env.NODE_ENV || "development";
+
+console.log(`Using environment config: '${activeEnv}'`)
+
+require("dotenv").config({
+  path: `.env.${activeEnv}`,
+})
+
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Default Starter`,
-    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
-    author: `@gatsbyjs`,
+    title: `Forma`,
+    description: `Yarn, Weaving and Knitting Supplies - Whitmore Lake, MI`,
+    author: `Jennifer Scroggins - jennifer@ravenwilde.com`,
   },
   plugins: [
+    {
+      resolve: 'gatsby-source-prismic-graphql',
+      options: {
+        repositoryName: 'forma', // required
+        defaultLang: 'en-us', // optional, but recommended
+        accessToken: process.env.PRISMIC_ACCESS_TOKEN, // optional
+        path: '/preview', // optional, default: /preview
+        previews: true, // optional, default: false
+        sharpKeys: [
+          /image|photo|picture/, // (default)
+          'profilepic',
+        ],
+      }
+    },
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,
