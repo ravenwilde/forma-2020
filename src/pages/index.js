@@ -1,22 +1,35 @@
 import React from "react"
 import { Link, graphql } from "gatsby"
-import { RichText } from 'prismic-reactjs'
+import { map, find } from "lodash"
+
+import BusinessInfo from "../components/business-info"
+import ClassInfo from "../components/class-info"
+import EquipmentInfo from "../components/equipment-info"
+import HoursInfo from "../components/hours-info"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 
 const IndexPage = ({ data }) => {
-  const pageData = data.prismic.allBusiness_infos.edges[0].node;
-  const siteMetadata = data.site.siteMetadata;
+  const { prismic, site } = data;
+
+  const siteMetadata = site.siteMetadata;
+
+  const content = map(prismic._allDocuments.edges, (i) => (i.node));
+  const businessInfo = find(content, (b) => ( b.__typename === "PRISMIC_Business_info"));
+  const hoursInfo = find(content, (b) => ( b.__typename === "PRISMIC_Hours_info"));
+  const classInfo = find(content, (b) => ( b.__typename === "PRISMIC_Class_info"));
+  const equipmentInfo = find(content, (b) => ( b.__typename === "PRISMIC_Equipment_info"));
 
   return (
-    <Layout siteTitle={data.site.siteMetadata.title}>
+    <Layout siteTitle={siteMetadata.title}>
       <SEO {...siteMetadata} />
-      <h1>{pageData.business_name[0].text}</h1>
-      <p>{pageData.business_description[0].text}</p>
+      <BusinessInfo {...businessInfo} />
+      <HoursInfo {...hoursInfo} />
+      <ClassInfo {...classInfo} />
+      <EquipmentInfo {...equipmentInfo} />
      
       <Link to="/page-2/">Go to page 2</Link> <br />
-      <Link to="/using-typescript/">Go to "Using TypeScript"</Link>
     </Layout>
   );
 }
@@ -32,23 +45,44 @@ export const query = graphql `
         author
       }
     }
-    prismic { 
-      allBusiness_infos {
-        edges {
-          node {
+    prismic {
+    _allDocuments {
+      edges {
+        node {
+          ... on PRISMIC_Business_info {
+            business_name
+            business_description
             business_address_locality
             business_address_postal_code
             business_address_region
-            business_description
-            business_hours
-            business_name
             business_payment_notice
             business_phone_number
             business_street_address
           }
+          ... on PRISMIC_Class_info {
+            class_info_header
+            class_info_text
+          }
+          ... on PRISMIC_Equipment_info {
+            equipment_info_header
+            equipment_info_text
+          }
+          ... on PRISMIC_Hours_info {
+            hours_info_header
+            hours_info_text
+            hours_current
+            reopening_phase_details {
+              phase_description
+              phase_name
+              phase_note
+              phase_special_notice
+              phase_start_date
+            }
+          }
         }
       }
     }
+  }
   }
 `
 
